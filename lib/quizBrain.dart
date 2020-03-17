@@ -44,4 +44,16 @@ class QuizBrain {
   bool getCorrectAnswer() {
     return _questionBank[_questionNumber].questionAnswer;
   }
+
+  bool questionsEnded() {
+    if (_questionNumber < _questionBank.length - 1) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  void reset() {
+    _questionNumber = 0;
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'quizBrain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 QuizBrain quizBrain = QuizBrain();
 void main() => runApp(Quizzler());
@@ -28,6 +29,66 @@ class QuizPage extends StatefulWidget {
 
 class _QuizPageState extends State<QuizPage> {
   List<Icon> scoreKeeper = [];
+
+  void checkAnswer(bool userPickedAnswer) {
+    bool correctAnswer = quizBrain.getCorrectAnswer();
+    if (userPickedAnswer == correctAnswer) {
+      print("user got it right");
+      scoreKeeper.add(
+        Icon(
+          Icons.check,
+          color: Colors.green,
+        ),
+      );
+    } else {
+      print("user got it wrong");
+      scoreKeeper.add(
+        Icon(
+          Icons.close,
+          color: Colors.red,
+        ),
+      );
+    }
+
+    setState(() {
+      quizBrain.nextQuestion();
+    });
+  }
+
+  void showEndOfQuestionAlert() {
+    Alert(
+      context: context,
+      type: AlertType.error,
+      title: "ALERT",
+      desc: "Quetion Ended. Would you like to try again?",
+      buttons: [
+        DialogButton(
+          child: Text(
+            "YES",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: () {
+            setState(() {
+              quizBrain.reset();
+              scoreKeeper = [];
+              Navigator.pop(context);
+            });
+          },
+          width: 120,
+        ),
+        DialogButton(
+          child: Text(
+            "NO",
+            style: TextStyle(color: Colors.red, fontSize: 20),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          width: 120,
+        )
+      ],
+    ).show();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,16 +128,11 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
-                bool correctAnswer = quizBrain.getCorrectAnswer();
-                if (correctAnswer == true) {
-                  print("user got it right");
+                if (quizBrain.questionsEnded()) {
+                  showEndOfQuestionAlert();
                 } else {
-                  print("user got it wrong");
+                  checkAnswer(true);
                 }
-
-                setState(() {
-                  quizBrain.nextQuestion();
-                });
               },
             ),
           ),
@@ -94,15 +150,11 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
-                bool correctAnswer = quizBrain.getCorrectAnswer();
-                if (correctAnswer == false) {
-                  print("user got it right");
+                if (quizBrain.questionsEnded()) {
+                  showEndOfQuestionAlert();
                 } else {
-                  print("user got it wrong");
+                  checkAnswer(false);
                 }
-                setState(() {
-                  quizBrain.nextQuestion();
-                });
               },
             ),
           ),
